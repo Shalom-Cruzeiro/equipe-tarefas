@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quadro da Equipe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ECEFEC;
+    --ink: #0F2E2A;
+    --surface: #FFFFFF;
+    --text: #1B2B27;
+    --muted: #66807A;
+    --line: #DCE4E0;
+    --brand: #15635A;
+    --accent: #E86F4E;
+    --accent-dark: #Cf5a3b;
+    --todo: #8A9D98;
+    --doing: #3A78C2;
+    --review: #D29A2A;
+    --done: #2E9E69;
+    --p-alta: #D85742;
+    --p-media: #D29A2A;
+    --p-baixa: #5E9384;
+    --radius: 12px;
+    --shadow: 0 1px 2px rgba(16,46,42,.06), 0 4px 16px rgba(16,46,42,.05);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- Cabeçalho ---------- */
+  header.topo {
+    background: var(--ink);
+    color: #EAF2EF;
+    padding: 22px clamp(16px, 4vw, 40px) 18px;
+  }
+  .topo-linha {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .marca {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.4rem, 3.5vw, 2rem);
+    letter-spacing: -0.02em;
+    color: #FFFFFF;
+  }
+  .ao-vivo {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: .8rem;
+    color: #9FC4BB;
+    margin-left: auto;
+  }
+  .ponto {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #4ED39A;
+    box-shadow: 0 0 0 0 rgba(78,211,154,.6);
+    animation: pulso 2.4s infinite;
+  }
+  .ponto.offline { background: #C77; animation: none; box-shadow: none; }
+  @keyframes pulso {
+    0% { box-shadow: 0 0 0 0 rgba(78,211,154,.5); }
+    70% { box-shadow: 0 0 0 7px rgba(78,211,154,0); }
+    100% { box-shadow: 0 0 0 0 rgba(78,211,154,0); }
+  }
+
+  /* Barra de fluxo (assinatura): mostra como o trabalho está distribuído */
+  .fluxo {
+    margin-top: 16px;
+    max-width: 520px;
+  }
+  .fluxo-barra {
+    display: flex;
+    height: 8px;
+    border-radius: 99px;
+    overflow: hidden;
+    background: rgba(255,255,255,.12);
+  }
+  .fluxo-seg { transition: width .4s ease; }
+  .fluxo-legenda {
+    margin-top: 8px;
+    font-size: .78rem;
+    color: #9FC4BB;
+  }
+  .fluxo-legenda b { color: #EAF2EF; font-weight: 600; }
+
+  /* ---------- Barra de ferramentas ---------- */
+  .ferramentas {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 16px clamp(16px, 4vw, 40px);
+  }
+  .filtro {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .85rem;
+    color: var(--muted);
+  }
+  select, input, .btn {
+    font-family: inherit;
+    font-size: .9rem;
+  }
+  select.campo {
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--text);
+    padding: 8px 10px;
+    border-radius: 9px;
+    cursor: pointer;
+  }
+  .btn {
+    cursor: pointer;
+    border: none;
+    border-radius: 9px;
+    padding: 10px 16px;
+    font-weight: 600;
+    transition: background .15s, transform .05s;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn-principal {
+    background: var(--accent);
+    color: #fff;
+    margin-left: auto;
+  }
+  .btn-principal:hover { background: var(--accent-dark); }
+
+  /* ---------- Quadro ---------- */
+  .quadro {
+    display: flex;
+    gap: 16px;
+    padding: 0 clamp(16px, 4vw, 40px) 40px;
+    overflow-x: auto;
+    align-items: flex-start;
+  }
+  .coluna {
+    flex: 1 0 270px;
+    min-width: 270px;
+    background: rgba(255,255,255,.5);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 12px;
+  }
+  .coluna-topo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 2px 4px 12px;
+  }
+  .coluna-marca { width: 9px; height: 9px; border-radius: 3px; }
+  .coluna-nome {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 700;
+    font-size: .95rem;
+    letter-spacing: -0.01em;
+  }
+  .coluna-conta {
+    margin-left: auto;
+    font-size: .78rem;
+    color: var(--muted);
+    background: var(--bg);
+    border-radius: 99px;
+    padding: 2px 9px;
+  }
+  .lista { display: flex; flex-direction: column; gap: 10px; min-height: 8px; }
+
+  /* ---------- Cartão ---------- */
+  .cartao {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    padding: 12px 12px 10px;
+    position: relative;
+  }
+  .cartao-topo { display: flex; gap: 8px; align-items: flex-start; }
+  .prio { width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; flex: none; }
+  .cartao-titulo { font-weight: 500; font-size: .92rem; word-break: break-word; }
+  .cartao-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+    align-items: center;
+  }
+  .chip {
+    font-size: .74rem;
+    padding: 3px 8px;
+    border-radius: 99px;
+    background: var(--bg);
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .chip.pessoa { background: #E8F0EE; color: var(--brand); font-weight: 500; }
+  .chip.prazo.atrasado { background: #FBE6E2; color: var(--p-alta); font-weight: 500; }
+  .cartao-acoes {
+    display: flex;
+    gap: 4px;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid var(--line);
+  }
+  .acao {
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    border-radius: 7px;
+    padding: 5px 8px;
+    font-size: .8rem;
+    font-family: inherit;
+    transition: background .12s, color .12s;
+  }
+  .acao:hover:not(:disabled) { background: var(--bg); color: var(--text); }
+  .acao:disabled { opacity: .3; cursor: default; }
+  .acao.mover { font-weight: 600; }
+  .acao.excluir { margin-left: auto; }
+  .acao.excluir:hover { background: #FBE6E2; color: var(--p-alta); }
+
+  .vazio {
+    font-size: .82rem;
+    color: var(--muted);
+    text-align: center;
+    padding: 14px 8px;
+    border: 1px dashed var(--line);
+    border-radius: 9px;
+  }
+
+  /* ---------- Modal ---------- */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(15,46,42,.45);
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 8vh 16px 16px;
+    z-index: 50;
+  }
+  .overlay.aberto { display: flex; }
+  .modal {
+    background: var(--surface);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 440px;
+    padding: 24px;
+    box-shadow: 0 20px 60px rgba(16,46,42,.25);
+  }
+  .modal h2 {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 1.25rem;
+    letter-spacing: -0.02em;
+    margin-bottom: 18px;
+  }
+  .grupo { margin-bottom: 14px; }
+  .grupo label {
+    display: block;
+    font-size: .8rem;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .grupo input, .grupo select {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    padding: 10px 12px;
+    color: var(--text);
+    background: #fff;
+  }
+  .grupo input:focus, .grupo select:focus, select.campo:focus, .btn:focus-visible, .acao:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 1px;
+  }
+  .dois { display: flex; gap: 12px; }
+  .dois .grupo { flex: 1; }
+  .modal-acoes { display: flex; gap: 10px; margin-top: 22px; }
+  .btn-secundario {
+    background: var(--bg);
+    color: var(--text);
+  }
+  .btn-secundario:hover { background: #E1E6E2; }
+  .modal-acoes .btn { flex: 1; }
+
+  .erro-faixa {
+    background: #FBE6E2;
+    color: var(--p-alta);
+    padding: 10px clamp(16px, 4vw, 40px);
+    font-size: .85rem;
+    display: none;
+  }
+  .erro-faixa.visivel { display: block; }
+
+  .carregando {
+    text-align: center;
+    color: var(--muted);
+    padding: 60px 20px;
+    font-size: .9rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ponto { animation: none; }
+    .fluxo-seg { transition: none; }
+  }
+</style>
+</head>
+<body>
+  <header class="topo">
+    <div class="topo-linha">
+      <span class="marca">Quadro da Equipe</span>
+      <span class="ao-vivo"><span class="ponto" id="ponto"></span><span id="estado-conexao">conectando…</span></span>
+    </div>
+    <div class="fluxo">
+      <div class="fluxo-barra" id="fluxo-barra"></div>
+      <div class="fluxo-legenda" id="fluxo-legenda"></div>
+    </div>
+  </header>
+
+  <div class="erro-faixa" id="erro-faixa"></div>
+
+  <div class="ferramentas">
+    <span class="filtro">
+      Responsável
+      <select class="campo" id="filtro-pessoa"><option value="todos">Todos</option></select>
+    </span>
+    <button class="btn btn-principal" id="btn-nova">+ Nova tarefa</button>
+  </div>
+
+  <div id="conteudo">
+    <div class="carregando">Carregando o quadro…</div>
+  </div>
+
+  <!-- Modal de tarefa -->
+  <div class="overlay" id="overlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+      <h2 id="modal-titulo">Nova tarefa</h2>
+      <div class="grupo">
+        <label for="f-titulo">O que precisa ser feito</label>
+        <input type="text" id="f-titulo" placeholder="Ex.: Revisar proposta do cliente X" maxlength="200">
+      </div>
+      <div class="grupo">
+        <label for="f-responsavel">Responsável</label>
+        <input type="text" id="f-responsavel" placeholder="Nome de quem vai fazer" maxlength="60">
+      </div>
+      <div class="dois">
+        <div class="grupo">
+          <label for="f-prazo">Prazo</label>
+          <input type="date" id="f-prazo">
+        </div>
+        <div class="grupo">
+          <label for="f-prioridade">Prioridade</label>
+          <select id="f-prioridade">
+            <option value="alta">Alta</option>
+            <option value="media" selected>Média</option>
+            <option value="baixa">Baixa</option>
+          </select>
+        </div>
+      </div>
+      <div class="grupo">
+        <label for="f-status">Coluna</label>
+        <select id="f-status">
+          <option value="todo">A fazer</option>
+          <option value="doing">Fazendo</option>
+          <option value="review">Em revisão</option>
+          <option value="done">Concluído</option>
+        </select>
+      </div>
+      <div class="modal-acoes">
+        <button class="btn btn-secundario" id="btn-cancelar">Cancelar</button>
+        <button class="btn btn-principal" id="btn-salvar" style="margin-left:0">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const COLUNAS = [
+    { id: 'todo',   nome: 'A fazer',     cor: 'var(--todo)' },
+    { id: 'doing',  nome: 'Fazendo',     cor: 'var(--doing)' },
+    { id: 'review', nome: 'Em revisão',  cor: 'var(--review)' },
+    { id: 'done',   nome: 'Concluído',   cor: 'var(--done)' },
+  ];
+  const PRIORIDADES = {
+    alta:  { nome: 'Alta',  cor: 'var(--p-alta)' },
+    media: { nome: 'Média', cor: 'var(--p-media)' },
+    baixa: { nome: 'Baixa', cor: 'var(--p-baixa)' },
+  };
+
+  let tarefas = [];
+  let filtroPessoa = 'todos';
+  let editandoId = null;
+  let ocupado = false; // evita que o auto-refresh atrapalhe uma ação em andamento
+
+  const $ = (sel) => document.querySelector(sel);
+  const conteudo = $('#conteudo');
+
+  function escapar(txt) {
+    return String(txt ?? '').replace(/[&<>"']/g, (c) =>
+      ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  }
+
+  function hoje() {
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
+  function formatarPrazo(p) {
+    if (!p) return null;
+    const d = new Date(p + 'T00:00:00');
+    if (isNaN(d)) return null;
+    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+  }
+
+  // ---------- Comunicação com o servidor ----------
+  async function api(metodo, caminho, corpo) {
+    const opt = { method: metodo, headers: { 'Content-Type': 'application/json' } };
+    if (corpo) opt.body = JSON.stringify(corpo);
+    const r = await fetch(caminho, opt);
+    if (!r.ok) {
+      const j = await r.json().catch(() => ({}));
+      throw new Error(j.erro || 'Algo deu errado ao falar com o servidor.');
+    }
+    return r.json();
+  }
+
+  function mostrarErro(msg) {
+    const faixa = $('#erro-faixa');
+    faixa.textContent = msg;
+    faixa.classList.add('visivel');
+    conectado(false);
+  }
+  function limparErro() { $('#erro-faixa').classList.remove('visivel'); }
+
+  function conectado(ok) {
+    $('#ponto').classList.toggle('offline', !ok);
+    $('#estado-conexao').textContent = ok ? 'sincronizado' : 'sem conexão';
+  }
+
+  async function carregar() {
+    if (ocupado) return;
+    try {
+      tarefas = await api('GET', '/api/tarefas');
+      limparErro();
+      conectado(true);
+      render();
+    } catch (e) {
+      mostrarErro('Não foi possível carregar as tarefas. ' + e.message);
+    }
+  }
+
+  // ---------- Render ----------
+  function pessoasUnicas() {
+    return [...new Set(tarefas.map(t => t.responsavel).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+  }
+
+  function renderFiltro() {
+    const sel = $('#filtro-pessoa');
+    const atual = sel.value;
+    sel.innerHTML = '<option value="todos">Todos</option>' +
+      pessoasUnicas().map(p => `<option value="${escapar(p)}">${escapar(p)}</option>`).join('');
+    sel.value = [...sel.options].some(o => o.value === atual) ? atual : 'todos';
+  }
+
+  function renderFluxo() {
+    const total = tarefas.length;
+    const barra = $('#fluxo-barra');
+    const legenda = $('#fluxo-legenda');
+    if (total === 0) {
+      barra.innerHTML = '';
+      legenda.innerHTML = 'Nenhuma tarefa ainda. Comece adicionando o que está na cabeça da equipe.';
+      return;
+    }
+    barra.innerHTML = COLUNAS.map(c => {
+      const n = tarefas.filter(t => t.status === c.id).length;
+      const pct = (n / total) * 100;
+      return `<div class="fluxo-seg" style="width:${pct}%;background:${c.cor}" title="${c.nome}: ${n}"></div>`;
+    }).join('');
+    const feitas = tarefas.filter(t => t.status === 'done').length;
+    legenda.innerHTML = `<b>${feitas}</b> de <b>${total}</b> tarefas concluídas`;
+  }
+
+  function cartaoHTML(t) {
+    const i = COLUNAS.findIndex(c => c.id === t.status);
+    const prazoFmt = formatarPrazo(t.prazo);
+    const atrasado = t.prazo && t.status !== 'done' && t.prazo < hoje();
+    return `
+      <div class="cartao">
+        <div class="cartao-topo">
+          <span class="prio" style="background:${PRIORIDADES[t.prioridade]?.cor || 'var(--p-media)'}" title="Prioridade ${PRIORIDADES[t.prioridade]?.nome || ''}"></span>
+          <span class="cartao-titulo">${escapar(t.titulo)}</span>
+        </div>
+        <div class="cartao-meta">
+          ${t.responsavel ? `<span class="chip pessoa">${escapar(t.responsavel)}</span>` : ''}
+          ${prazoFmt ? `<span class="chip prazo ${atrasado ? 'atrasado' : ''}">${atrasado ? 'Atrasada · ' : ''}${prazoFmt}</span>` : ''}
+        </div>
+        <div class="cartao-acoes">
+          <button class="acao mover" data-acao="mover" data-id="${t.id}" data-dir="-1" ${i<=0?'disabled':''} title="Mover para a esquerda">←</button>
+          <button class="acao mover" data-acao="mover" data-id="${t.id}" data-dir="1" ${i>=COLUNAS.length-1?'disabled':''} title="Mover para a direita">→</button>
+          <button class="acao" data-acao="editar" data-id="${t.id}">Editar</button>
+          <button class="acao excluir" data-acao="excluir" data-id="${t.id}" title="Excluir">Excluir</button>
+        </div>
+      </div>`;
+  }
+
+  function render() {
+    renderFiltro();
+    renderFluxo();
+    const visiveis = tarefas.filter(t => filtroPessoa === 'todos' || t.responsavel === filtroPessoa);
+    conteudo.innerHTML = `<div class="quadro">` + COLUNAS.map(col => {
+      const itens = visiveis.filter(t => t.status === col.id);
+      return `
+        <section class="coluna">
+          <div class="coluna-topo">
+            <span class="coluna-marca" style="background:${col.cor}"></span>
+            <span class="coluna-nome">${col.nome}</span>
+            <span class="coluna-conta">${itens.length}</span>
+          </div>
+          <div class="lista">
+            ${itens.length ? itens.map(cartaoHTML).join('') : '<div class="vazio">Nada aqui ainda</div>'}
+          </div>
+        </section>`;
+    }).join('') + `</div>`;
+  }
+
+  // ---------- Ações ----------
+  conteudo.addEventListener('click', async (e) => {
+    const botao = e.target.closest('[data-acao]');
+    if (!botao) return;
+    const id = botao.dataset.id;
+    const t = tarefas.find(x => x.id === id);
+    if (!t) return;
+
+    if (botao.dataset.acao === 'mover') {
+      const i = COLUNAS.findIndex(c => c.id === t.status) + Number(botao.dataset.dir);
+      if (i < 0 || i >= COLUNAS.length) return;
+      await acaoServidor(() => api('PATCH', '/api/tarefas/' + id, { status: COLUNAS[i].id }));
+    } else if (botao.dataset.acao === 'editar') {
+      abrirModal(t);
+    } else if (botao.dataset.acao === 'excluir') {
+      if (confirm('Excluir "' + t.titulo + '"? Isso não pode ser desfeito.')) {
+        await acaoServidor(() => api('DELETE', '/api/tarefas/' + id));
+      }
+    }
+  });
+
+  async function acaoServidor(fn) {
+    ocupado = true;
+    try {
+      await fn();
+      tarefas = await api('GET', '/api/tarefas');
+      limparErro();
+      conectado(true);
+      render();
+    } catch (err) {
+      mostrarErro(err.message);
+    } finally {
+      ocupado = false;
+    }
+  }
+
+  // ---------- Modal ----------
+  function abrirModal(t) {
+    editandoId = t ? t.id : null;
+    $('#modal-titulo').textContent = t ? 'Editar tarefa' : 'Nova tarefa';
+    $('#f-titulo').value = t ? t.titulo : '';
+    $('#f-responsavel').value = t ? t.responsavel : '';
+    $('#f-prazo').value = t ? t.prazo : '';
+    $('#f-prioridade').value = t ? t.prioridade : 'media';
+    $('#f-status').value = t ? t.status : 'todo';
+    $('#overlay').classList.add('aberto');
+    setTimeout(() => $('#f-titulo').focus(), 30);
+  }
+  function fecharModal() {
+    $('#overlay').classList.remove('aberto');
+    editandoId = null;
+  }
+
+  async function salvar() {
+    const dados = {
+      titulo: $('#f-titulo').value.trim(),
+      responsavel: $('#f-responsavel').value.trim(),
+      prazo: $('#f-prazo').value,
+      prioridade: $('#f-prioridade').value,
+      status: $('#f-status').value,
+    };
+    if (!dados.titulo) { $('#f-titulo').focus(); return; }
+    await acaoServidor(() =>
+      editandoId
+        ? api('PATCH', '/api/tarefas/' + editandoId, dados)
+        : api('POST', '/api/tarefas', dados)
+    );
+    fecharModal();
+  }
+
+  $('#btn-nova').addEventListener('click', () => abrirModal(null));
+  $('#btn-cancelar').addEventListener('click', fecharModal);
+  $('#btn-salvar').addEventListener('click', salvar);
+  $('#overlay').addEventListener('click', (e) => { if (e.target.id === 'overlay') fecharModal(); });
+  $('#filtro-pessoa').addEventListener('change', (e) => { filtroPessoa = e.target.value; render(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') fecharModal();
+    if (e.key === 'Enter' && $('#overlay').classList.contains('aberto') && e.target.tagName !== 'SELECT') salvar();
+  });
+
+  // ---------- Início + sincronização automática ----------
+  carregar();
+  setInterval(carregar, 5000); // a cada 5s busca o que os colegas mudaram
+</script>
+</body>
+</html>
