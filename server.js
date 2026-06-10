@@ -84,7 +84,7 @@ app.patch('/api/tarefas/:id', (req, res) => {
   }
   if ('responsavel' in c) t.responsavel = (c.responsavel || '').trim();
   if ('area' in c) t.area = (c.area || '').trim();
-  if ('prazo' in c) t.prazo = c.prazo || '';
+  // Prazo é TRAVADO: definido só na criação, nunca alterado depois (protege a eficácia).
   if ('prioridade' in c && PRIORIDADES_VALIDAS.includes(c.prioridade)) t.prioridade = c.prioridade;
   if ('status' in c && STATUS_VALIDOS.includes(c.status)) t.status = c.status;
 
