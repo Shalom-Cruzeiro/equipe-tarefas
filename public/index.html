@@ -9,314 +9,147 @@
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #ECEFEC;
-    --ink: #0F2E2A;
-    --surface: #FFFFFF;
-    --text: #1B2B27;
-    --muted: #66807A;
-    --line: #DCE4E0;
-    --brand: #15635A;
-    --accent: #E86F4E;
-    --accent-dark: #Cf5a3b;
-    --todo: #8A9D98;
-    --doing: #3A78C2;
-    --review: #D29A2A;
-    --done: #2E9E69;
-    --p-alta: #D85742;
-    --p-media: #D29A2A;
-    --p-baixa: #5E9384;
-    --radius: 12px;
-    --shadow: 0 1px 2px rgba(16,46,42,.06), 0 4px 16px rgba(16,46,42,.05);
+    --bg: #ECEFEC; --ink: #0F2E2A; --surface: #FFFFFF; --text: #1B2B27;
+    --muted: #66807A; --line: #DCE4E0; --brand: #15635A; --accent: #E86F4E;
+    --accent-dark: #CF5A3B; --todo: #8A9D98; --doing: #3A78C2; --review: #D29A2A;
+    --done: #2E9E69; --p-alta: #D85742; --p-media: #D29A2A; --p-baixa: #5E9384;
+    --vermelho-bg: #FDF2F0; --vermelho-borda: #EBB4A9;
+    --radius: 12px; --shadow: 0 1px 2px rgba(16,46,42,.06), 0 4px 16px rgba(16,46,42,.05);
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.45; -webkit-font-smoothing: antialiased; }
 
-  body {
-    font-family: 'Inter', system-ui, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.45;
-    -webkit-font-smoothing: antialiased;
-  }
+  header.topo { background: var(--ink); color: #EAF2EF; padding: 20px clamp(16px,4vw,40px) 0; }
+  .topo-linha { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .marca { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: clamp(1.3rem,3.5vw,1.9rem); letter-spacing: -0.02em; color: #fff; }
+  .ao-vivo { display: inline-flex; align-items: center; gap: 7px; font-size: .8rem; color: #9FC4BB; margin-left: auto; }
+  .ponto { width: 8px; height: 8px; border-radius: 50%; background: #4ED39A; animation: pulso 2.4s infinite; }
+  .ponto.offline { background: #C77; animation: none; }
+  @keyframes pulso { 0%{box-shadow:0 0 0 0 rgba(78,211,154,.5);} 70%{box-shadow:0 0 0 7px rgba(78,211,154,0);} 100%{box-shadow:0 0 0 0 rgba(78,211,154,0);} }
 
-  /* ---------- Cabeçalho ---------- */
-  header.topo {
-    background: var(--ink);
-    color: #EAF2EF;
-    padding: 22px clamp(16px, 4vw, 40px) 18px;
-  }
-  .topo-linha {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-  .marca {
-    font-family: 'Bricolage Grotesque', sans-serif;
-    font-weight: 700;
-    font-size: clamp(1.4rem, 3.5vw, 2rem);
-    letter-spacing: -0.02em;
-    color: #FFFFFF;
-  }
-  .ao-vivo {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    font-size: .8rem;
-    color: #9FC4BB;
-    margin-left: auto;
-  }
-  .ponto {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: #4ED39A;
-    box-shadow: 0 0 0 0 rgba(78,211,154,.6);
-    animation: pulso 2.4s infinite;
-  }
-  .ponto.offline { background: #C77; animation: none; box-shadow: none; }
-  @keyframes pulso {
-    0% { box-shadow: 0 0 0 0 rgba(78,211,154,.5); }
-    70% { box-shadow: 0 0 0 7px rgba(78,211,154,0); }
-    100% { box-shadow: 0 0 0 0 rgba(78,211,154,0); }
-  }
+  .nav { display: flex; gap: 4px; margin-top: 18px; flex-wrap: wrap; }
+  .aba { background: transparent; border: none; color: #9FC4BB; font-family: 'Bricolage Grotesque',sans-serif; font-weight: 500; font-size: .92rem; padding: 10px 16px; cursor: pointer; border-radius: 9px 9px 0 0; border-bottom: 3px solid transparent; }
+  .aba:hover { color: #EAF2EF; }
+  .aba.ativa { color: #fff; border-bottom-color: var(--accent); }
 
-  /* Barra de fluxo (assinatura): mostra como o trabalho está distribuído */
-  .fluxo {
-    margin-top: 16px;
-    max-width: 520px;
-  }
-  .fluxo-barra {
-    display: flex;
-    height: 8px;
-    border-radius: 99px;
-    overflow: hidden;
-    background: rgba(255,255,255,.12);
-  }
+  .erro-faixa { background: #FBE6E2; color: var(--p-alta); padding: 10px clamp(16px,4vw,40px); font-size: .85rem; display: none; }
+  .erro-faixa.visivel { display: block; }
+
+  .area-conteudo { padding: 22px clamp(16px,4vw,40px) 48px; }
+
+  /* fluxo */
+  .fluxo { max-width: 520px; margin-bottom: 18px; }
+  .fluxo-barra { display: flex; height: 8px; border-radius: 99px; overflow: hidden; background: #DEE6E3; }
   .fluxo-seg { transition: width .4s ease; }
-  .fluxo-legenda {
-    margin-top: 8px;
-    font-size: .78rem;
-    color: #9FC4BB;
-  }
-  .fluxo-legenda b { color: #EAF2EF; font-weight: 600; }
+  .fluxo-legenda { margin-top: 8px; font-size: .8rem; color: var(--muted); }
+  .fluxo-legenda b { color: var(--text); font-weight: 600; }
 
-  /* ---------- Barra de ferramentas ---------- */
-  .ferramentas {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    padding: 16px clamp(16px, 4vw, 40px);
-  }
-  .filtro {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: .85rem;
-    color: var(--muted);
-  }
-  select, input, .btn {
-    font-family: inherit;
-    font-size: .9rem;
-  }
-  select.campo {
-    border: 1px solid var(--line);
-    background: var(--surface);
-    color: var(--text);
-    padding: 8px 10px;
-    border-radius: 9px;
-    cursor: pointer;
-  }
-  .btn {
-    cursor: pointer;
-    border: none;
-    border-radius: 9px;
-    padding: 10px 16px;
-    font-weight: 600;
-    transition: background .15s, transform .05s;
-  }
+  /* botoes */
+  .btn { cursor: pointer; border: none; border-radius: 9px; padding: 10px 16px; font-weight: 600; font-family: inherit; font-size: .9rem; transition: background .15s, transform .05s; }
   .btn:active { transform: translateY(1px); }
-  .btn-principal {
-    background: var(--accent);
-    color: #fff;
-    margin-left: auto;
-  }
+  .btn-principal { background: var(--accent); color: #fff; }
   .btn-principal:hover { background: var(--accent-dark); }
+  .btn-secundario { background: var(--bg); color: var(--text); }
+  .btn-secundario:hover { background: #E1E6E2; }
+  .btn-fino { padding: 8px 14px; font-size: .85rem; }
 
-  /* ---------- Quadro ---------- */
-  .quadro {
-    display: flex;
-    gap: 16px;
-    padding: 0 clamp(16px, 4vw, 40px) 40px;
-    overflow-x: auto;
-    align-items: flex-start;
-  }
-  .coluna {
-    flex: 1 0 270px;
-    min-width: 270px;
-    background: rgba(255,255,255,.5);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 12px;
-  }
-  .coluna-topo {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 2px 4px 12px;
-  }
+  .barra-acoes { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+  .filtro { display: inline-flex; align-items: center; gap: 8px; font-size: .85rem; color: var(--muted); }
+  select.campo, input.campo { font-family: inherit; font-size: .9rem; border: 1px solid var(--line); background: var(--surface); color: var(--text); padding: 8px 10px; border-radius: 9px; }
+  select.campo { cursor: pointer; }
+  .empurra { margin-left: auto; }
+
+  /* quadro */
+  .quadro { display: flex; gap: 16px; overflow-x: auto; align-items: flex-start; padding-bottom: 6px; }
+  .coluna { flex: 1 0 270px; min-width: 270px; background: rgba(255,255,255,.5); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; }
+  .coluna-topo { display: flex; align-items: center; gap: 8px; padding: 2px 4px 12px; }
   .coluna-marca { width: 9px; height: 9px; border-radius: 3px; }
-  .coluna-nome {
-    font-family: 'Bricolage Grotesque', sans-serif;
-    font-weight: 700;
-    font-size: .95rem;
-    letter-spacing: -0.01em;
-  }
-  .coluna-conta {
-    margin-left: auto;
-    font-size: .78rem;
-    color: var(--muted);
-    background: var(--bg);
-    border-radius: 99px;
-    padding: 2px 9px;
-  }
+  .coluna-nome { font-family: 'Bricolage Grotesque',sans-serif; font-weight: 700; font-size: .95rem; letter-spacing: -0.01em; }
+  .coluna-conta { margin-left: auto; font-size: .78rem; color: var(--muted); background: var(--bg); border-radius: 99px; padding: 2px 9px; }
   .lista { display: flex; flex-direction: column; gap: 10px; min-height: 8px; }
 
-  /* ---------- Cartão ---------- */
-  .cartao {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    box-shadow: var(--shadow);
-    padding: 12px 12px 10px;
-    position: relative;
-  }
+  .cartao { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); padding: 12px 12px 10px; }
+  .cartao.vermelho { background: var(--vermelho-bg); border-color: var(--vermelho-borda); border-left: 4px solid var(--p-alta); }
   .cartao-topo { display: flex; gap: 8px; align-items: flex-start; }
   .prio { width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; flex: none; }
   .cartao-titulo { font-weight: 500; font-size: .92rem; word-break: break-word; }
-  .cartao-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 10px;
-    align-items: center;
-  }
-  .chip {
-    font-size: .74rem;
-    padding: 3px 8px;
-    border-radius: 99px;
-    background: var(--bg);
-    color: var(--muted);
-    white-space: nowrap;
-  }
+  .cartao-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; align-items: center; }
+  .chip { font-size: .74rem; padding: 3px 8px; border-radius: 99px; background: var(--bg); color: var(--muted); white-space: nowrap; }
   .chip.pessoa { background: #E8F0EE; color: var(--brand); font-weight: 500; }
-  .chip.prazo.atrasado { background: #FBE6E2; color: var(--p-alta); font-weight: 500; }
-  .cartao-acoes {
-    display: flex;
-    gap: 4px;
-    margin-top: 10px;
-    padding-top: 8px;
-    border-top: 1px solid var(--line);
-  }
-  .acao {
-    border: none;
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    border-radius: 7px;
-    padding: 5px 8px;
-    font-size: .8rem;
-    font-family: inherit;
-    transition: background .12s, color .12s;
-  }
-  .acao:hover:not(:disabled) { background: var(--bg); color: var(--text); }
+  .chip.area { color: #fff; font-weight: 500; }
+  .chip.prazo.atrasado { background: #F7D6CF; color: var(--p-alta); font-weight: 600; }
+  .badge-atrasada { font-size: .72rem; font-weight: 600; color: var(--p-alta); background: #F7D6CF; padding: 2px 8px; border-radius: 99px; }
+  .cartao-acoes { display: flex; gap: 4px; margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--line); }
+  .cartao.vermelho .cartao-acoes { border-top-color: var(--vermelho-borda); }
+  .acao { border: none; background: transparent; color: var(--muted); cursor: pointer; border-radius: 7px; padding: 5px 8px; font-size: .8rem; font-family: inherit; }
+  .acao:hover:not(:disabled) { background: rgba(0,0,0,.05); color: var(--text); }
   .acao:disabled { opacity: .3; cursor: default; }
   .acao.mover { font-weight: 600; }
   .acao.excluir { margin-left: auto; }
-  .acao.excluir:hover { background: #FBE6E2; color: var(--p-alta); }
+  .acao.excluir:hover { background: #F7D6CF; color: var(--p-alta); }
+  .vazio { font-size: .82rem; color: var(--muted); text-align: center; padding: 14px 8px; border: 1px dashed var(--line); border-radius: 9px; }
 
-  .vazio {
-    font-size: .82rem;
-    color: var(--muted);
-    text-align: center;
-    padding: 14px 8px;
-    border: 1px dashed var(--line);
-    border-radius: 9px;
-  }
+  /* paineis (equipe) */
+  .paineis { display: grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap: 20px; }
+  .painel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+  .painel h2 { font-family: 'Bricolage Grotesque',sans-serif; font-size: 1.15rem; letter-spacing: -0.02em; margin-bottom: 4px; }
+  .painel p.sub { font-size: .82rem; color: var(--muted); margin-bottom: 16px; }
+  .form-linha { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .form-linha input.campo { flex: 1; min-width: 120px; }
+  .lista-itens { display: flex; flex-direction: column; gap: 8px; }
+  .item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 9px; }
+  .item .nome { font-weight: 500; font-size: .9rem; }
+  .item .funcao { font-size: .78rem; color: var(--muted); }
+  .item .cor-area { width: 12px; height: 12px; border-radius: 4px; flex: none; }
+  .item .del { margin-left: auto; border: none; background: transparent; color: var(--muted); cursor: pointer; font-size: 1.1rem; padding: 2px 8px; border-radius: 7px; }
+  .item .del:hover { background: #F7D6CF; color: var(--p-alta); }
 
-  /* ---------- Modal ---------- */
-  .overlay {
-    position: fixed; inset: 0;
-    background: rgba(15,46,42,.45);
-    display: none;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 8vh 16px 16px;
-    z-index: 50;
-  }
+  /* eficacia */
+  .grade-ef { display: grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap: 16px; }
+  .cartao-ef { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
+  .ef-topo { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
+  .ef-nome { font-family: 'Bricolage Grotesque',sans-serif; font-weight: 700; font-size: 1.05rem; }
+  .ef-pct { font-family: 'Bricolage Grotesque',sans-serif; font-weight: 700; font-size: 1.5rem; }
+  .ef-barra { height: 8px; border-radius: 99px; background: var(--bg); overflow: hidden; margin-bottom: 14px; }
+  .ef-barra div { height: 100%; transition: width .4s ease; }
+  .ef-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; font-size: .82rem; }
+  .ef-stats .rotulo { color: var(--muted); }
+  .ef-stats .valor { font-weight: 600; }
+  .ef-stats .alerta { color: var(--p-alta); }
+
+  /* tabela relatorio */
+  .tabela-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+  table.tabela { width: 100%; border-collapse: collapse; font-size: .86rem; }
+  table.tabela th, table.tabela td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  table.tabela th { font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); background: #F6F8F7; position: sticky; top: 0; }
+  table.tabela tr:last-child td { border-bottom: none; }
+  .tag-status, .tag-prio { font-size: .74rem; padding: 2px 9px; border-radius: 99px; color: #fff; }
+  .conta-rel { font-size: .82rem; color: var(--muted); margin-bottom: 14px; }
+
+  /* modal */
+  .overlay { position: fixed; inset: 0; background: rgba(15,46,42,.45); display: none; align-items: flex-start; justify-content: center; padding: 6vh 16px 16px; z-index: 50; }
   .overlay.aberto { display: flex; }
-  .modal {
-    background: var(--surface);
-    border-radius: 16px;
-    width: 100%;
-    max-width: 440px;
-    padding: 24px;
-    box-shadow: 0 20px 60px rgba(16,46,42,.25);
-  }
-  .modal h2 {
-    font-family: 'Bricolage Grotesque', sans-serif;
-    font-size: 1.25rem;
-    letter-spacing: -0.02em;
-    margin-bottom: 18px;
-  }
+  .modal { background: var(--surface); border-radius: 16px; width: 100%; max-width: 440px; padding: 24px; box-shadow: 0 20px 60px rgba(16,46,42,.25); }
+  .modal h2 { font-family: 'Bricolage Grotesque',sans-serif; font-size: 1.25rem; letter-spacing: -0.02em; margin-bottom: 18px; }
   .grupo { margin-bottom: 14px; }
-  .grupo label {
-    display: block;
-    font-size: .8rem;
-    font-weight: 500;
-    color: var(--muted);
-    margin-bottom: 6px;
-  }
-  .grupo input, .grupo select {
-    width: 100%;
-    border: 1px solid var(--line);
-    border-radius: 9px;
-    padding: 10px 12px;
-    color: var(--text);
-    background: #fff;
-  }
-  .grupo input:focus, .grupo select:focus, select.campo:focus, .btn:focus-visible, .acao:focus-visible {
-    outline: 2px solid var(--brand);
-    outline-offset: 1px;
-  }
+  .grupo label { display: block; font-size: .8rem; font-weight: 500; color: var(--muted); margin-bottom: 6px; }
+  .grupo input, .grupo select { width: 100%; border: 1px solid var(--line); border-radius: 9px; padding: 10px 12px; color: var(--text); background: #fff; font-family: inherit; font-size: .9rem; }
   .dois { display: flex; gap: 12px; }
   .dois .grupo { flex: 1; }
   .modal-acoes { display: flex; gap: 10px; margin-top: 22px; }
-  .btn-secundario {
-    background: var(--bg);
-    color: var(--text);
-  }
-  .btn-secundario:hover { background: #E1E6E2; }
   .modal-acoes .btn { flex: 1; }
+  .dica { font-size: .78rem; color: var(--muted); }
 
-  .erro-faixa {
-    background: #FBE6E2;
-    color: var(--p-alta);
-    padding: 10px clamp(16px, 4vw, 40px);
-    font-size: .85rem;
-    display: none;
-  }
-  .erro-faixa.visivel { display: block; }
+  input:focus, select:focus, .btn:focus-visible, .acao:focus-visible, .aba:focus-visible, .del:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
+  .carregando { text-align: center; color: var(--muted); padding: 60px 20px; }
 
-  .carregando {
-    text-align: center;
-    color: var(--muted);
-    padding: 60px 20px;
-    font-size: .9rem;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .ponto { animation: none; }
-    .fluxo-seg { transition: none; }
+  @media (prefers-reduced-motion: reduce) { .ponto, .fluxo-seg, .ef-barra div { animation: none; transition: none; } }
+  @media print {
+    header.topo, .erro-faixa, .nao-imprime { display: none !important; }
+    body { background: #fff; }
+    .area-conteudo { padding: 0; }
+    .tabela-wrap { border: none; }
+    table.tabela th { background: #fff; }
   }
 </style>
 </head>
@@ -326,27 +159,17 @@
       <span class="marca">Quadro da Equipe</span>
       <span class="ao-vivo"><span class="ponto" id="ponto"></span><span id="estado-conexao">conectando…</span></span>
     </div>
-    <div class="fluxo">
-      <div class="fluxo-barra" id="fluxo-barra"></div>
-      <div class="fluxo-legenda" id="fluxo-legenda"></div>
-    </div>
+    <nav class="nav" id="nav">
+      <button class="aba ativa" data-vista="quadro">Quadro</button>
+      <button class="aba" data-vista="eficacia">Eficácia</button>
+      <button class="aba" data-vista="relatorio">Relatório</button>
+      <button class="aba" data-vista="equipe">Equipe</button>
+    </nav>
   </header>
 
   <div class="erro-faixa" id="erro-faixa"></div>
+  <div class="area-conteudo" id="conteudo"><div class="carregando">Carregando…</div></div>
 
-  <div class="ferramentas">
-    <span class="filtro">
-      Responsável
-      <select class="campo" id="filtro-pessoa"><option value="todos">Todos</option></select>
-    </span>
-    <button class="btn btn-principal" id="btn-nova">+ Nova tarefa</button>
-  </div>
-
-  <div id="conteudo">
-    <div class="carregando">Carregando o quadro…</div>
-  </div>
-
-  <!-- Modal de tarefa -->
   <div class="overlay" id="overlay">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
       <h2 id="modal-titulo">Nova tarefa</h2>
@@ -354,9 +177,15 @@
         <label for="f-titulo">O que precisa ser feito</label>
         <input type="text" id="f-titulo" placeholder="Ex.: Revisar proposta do cliente X" maxlength="200">
       </div>
-      <div class="grupo">
-        <label for="f-responsavel">Responsável</label>
-        <input type="text" id="f-responsavel" placeholder="Nome de quem vai fazer" maxlength="60">
+      <div class="dois">
+        <div class="grupo">
+          <label for="f-responsavel">Responsável</label>
+          <select id="f-responsavel"></select>
+        </div>
+        <div class="grupo">
+          <label for="f-area">Área</label>
+          <select id="f-area"></select>
+        </div>
       </div>
       <div class="dois">
         <div class="grupo">
@@ -383,243 +212,306 @@
       </div>
       <div class="modal-acoes">
         <button class="btn btn-secundario" id="btn-cancelar">Cancelar</button>
-        <button class="btn btn-principal" id="btn-salvar" style="margin-left:0">Salvar</button>
+        <button class="btn btn-principal" id="btn-salvar">Salvar</button>
       </div>
     </div>
   </div>
 
 <script>
   const COLUNAS = [
-    { id: 'todo',   nome: 'A fazer',     cor: 'var(--todo)' },
-    { id: 'doing',  nome: 'Fazendo',     cor: 'var(--doing)' },
-    { id: 'review', nome: 'Em revisão',  cor: 'var(--review)' },
-    { id: 'done',   nome: 'Concluído',   cor: 'var(--done)' },
+    { id:'todo', nome:'A fazer', cor:'var(--todo)', hex:'#8A9D98' },
+    { id:'doing', nome:'Fazendo', cor:'var(--doing)', hex:'#3A78C2' },
+    { id:'review', nome:'Em revisão', cor:'var(--review)', hex:'#D29A2A' },
+    { id:'done', nome:'Concluído', cor:'var(--done)', hex:'#2E9E69' },
   ];
   const PRIORIDADES = {
-    alta:  { nome: 'Alta',  cor: 'var(--p-alta)' },
-    media: { nome: 'Média', cor: 'var(--p-media)' },
-    baixa: { nome: 'Baixa', cor: 'var(--p-baixa)' },
+    alta:{nome:'Alta',cor:'#D85742'}, media:{nome:'Média',cor:'#D29A2A'}, baixa:{nome:'Baixa',cor:'#5E9384'},
   };
 
-  let tarefas = [];
+  let estado = { tarefas:[], membros:[], areas:[] };
+  let vista = 'quadro';
   let filtroPessoa = 'todos';
+  let filtros = { resp:'todos', area:'todos', status:'todos', prio:'todos' };
   let editandoId = null;
-  let ocupado = false; // evita que o auto-refresh atrapalhe uma ação em andamento
+  let ocupado = false;
 
-  const $ = (sel) => document.querySelector(sel);
+  const $ = (s) => document.querySelector(s);
   const conteudo = $('#conteudo');
 
-  function escapar(txt) {
-    return String(txt ?? '').replace(/[&<>"']/g, (c) =>
-      ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
-  }
+  const escapar = (t) => String(t ?? '').replace(/[&<>"']/g, (c)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  const hoje = () => new Date().toLocaleDateString('en-CA');
+  function formatarData(p){ if(!p) return null; const d=new Date(p+'T00:00:00'); return isNaN(d)?null:d.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}); }
+  const nomeStatus = (id) => (COLUNAS.find(c=>c.id===id)||{}).nome || id;
+  const nomePrioridade = (id) => (PRIORIDADES[id]||{}).nome || id;
+  const corArea = (nome) => { const a = estado.areas.find(x=>x.nome===nome); return a ? a.cor : null; };
 
-  function hoje() {
-    const d = new Date();
-    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-  }
-
-  function formatarPrazo(p) {
-    if (!p) return null;
-    const d = new Date(p + 'T00:00:00');
-    if (isNaN(d)) return null;
-    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
-  }
-
-  // ---------- Comunicação com o servidor ----------
-  async function api(metodo, caminho, corpo) {
-    const opt = { method: metodo, headers: { 'Content-Type': 'application/json' } };
-    if (corpo) opt.body = JSON.stringify(corpo);
+  async function api(metodo, caminho, corpo){
+    const opt = { method:metodo, headers:{'Content-Type':'application/json'} };
+    if(corpo) opt.body = JSON.stringify(corpo);
     const r = await fetch(caminho, opt);
-    if (!r.ok) {
-      const j = await r.json().catch(() => ({}));
-      throw new Error(j.erro || 'Algo deu errado ao falar com o servidor.');
-    }
+    if(!r.ok){ const j = await r.json().catch(()=>({})); throw new Error(j.erro || 'Erro ao falar com o servidor.'); }
     return r.json();
   }
+  function mostrarErro(m){ const f=$('#erro-faixa'); f.textContent=m; f.classList.add('visivel'); conectado(false); }
+  function limparErro(){ $('#erro-faixa').classList.remove('visivel'); }
+  function conectado(ok){ $('#ponto').classList.toggle('offline',!ok); $('#estado-conexao').textContent = ok?'sincronizado':'sem conexão'; }
 
-  function mostrarErro(msg) {
-    const faixa = $('#erro-faixa');
-    faixa.textContent = msg;
-    faixa.classList.add('visivel');
-    conectado(false);
+  async function carregar(){
+    if(ocupado) return;
+    try{
+      estado = await api('GET','/api/dados');
+      limparErro(); conectado(true);
+      const digitando = document.activeElement && conteudo.contains(document.activeElement) && document.activeElement.tagName==='INPUT';
+      if(!digitando) render();
+    }catch(e){ mostrarErro('Não foi possível sincronizar. '+e.message); }
   }
-  function limparErro() { $('#erro-faixa').classList.remove('visivel'); }
-
-  function conectado(ok) {
-    $('#ponto').classList.toggle('offline', !ok);
-    $('#estado-conexao').textContent = ok ? 'sincronizado' : 'sem conexão';
-  }
-
-  async function carregar() {
-    if (ocupado) return;
-    try {
-      tarefas = await api('GET', '/api/tarefas');
-      limparErro();
-      conectado(true);
-      render();
-    } catch (e) {
-      mostrarErro('Não foi possível carregar as tarefas. ' + e.message);
-    }
+  async function acaoServidor(fn){
+    ocupado = true;
+    try{ await fn(); estado = await api('GET','/api/dados'); limparErro(); conectado(true); render(); }
+    catch(err){ mostrarErro(err.message); }
+    finally{ ocupado = false; }
   }
 
-  // ---------- Render ----------
-  function pessoasUnicas() {
-    return [...new Set(tarefas.map(t => t.responsavel).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+  // ---------- Render principal ----------
+  function render(){
+    document.querySelectorAll('.aba').forEach(a=>a.classList.toggle('ativa', a.dataset.vista===vista));
+    if(vista==='quadro') renderQuadro();
+    else if(vista==='eficacia') renderEficacia();
+    else if(vista==='relatorio') renderRelatorio();
+    else if(vista==='equipe') renderEquipe();
   }
 
-  function renderFiltro() {
-    const sel = $('#filtro-pessoa');
-    const atual = sel.value;
-    sel.innerHTML = '<option value="todos">Todos</option>' +
-      pessoasUnicas().map(p => `<option value="${escapar(p)}">${escapar(p)}</option>`).join('');
-    sel.value = [...sel.options].some(o => o.value === atual) ? atual : 'todos';
+  // ---------- Quadro ----------
+  function pessoasComTarefa(){ return [...new Set(estado.tarefas.map(t=>t.responsavel).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR')); }
+
+  function fluxoHTML(){
+    const total = estado.tarefas.length;
+    if(!total) return '<div class="fluxo"><div class="fluxo-legenda">Nenhuma tarefa ainda. Comece adicionando o que está na cabeça da equipe.</div></div>';
+    const segs = COLUNAS.map(c=>{ const n=estado.tarefas.filter(t=>t.status===c.id).length; return `<div class="fluxo-seg" style="width:${(n/total)*100}%;background:${c.cor}" title="${c.nome}: ${n}"></div>`; }).join('');
+    const feitas = estado.tarefas.filter(t=>t.status==='done').length;
+    return `<div class="fluxo"><div class="fluxo-barra">${segs}</div><div class="fluxo-legenda"><b>${feitas}</b> de <b>${total}</b> tarefas concluídas</div></div>`;
   }
 
-  function renderFluxo() {
-    const total = tarefas.length;
-    const barra = $('#fluxo-barra');
-    const legenda = $('#fluxo-legenda');
-    if (total === 0) {
-      barra.innerHTML = '';
-      legenda.innerHTML = 'Nenhuma tarefa ainda. Comece adicionando o que está na cabeça da equipe.';
-      return;
-    }
-    barra.innerHTML = COLUNAS.map(c => {
-      const n = tarefas.filter(t => t.status === c.id).length;
-      const pct = (n / total) * 100;
-      return `<div class="fluxo-seg" style="width:${pct}%;background:${c.cor}" title="${c.nome}: ${n}"></div>`;
+  function cartaoHTML(t){
+    const i = COLUNAS.findIndex(c=>c.id===t.status);
+    const prazoFmt = formatarData(t.prazo);
+    const atrasada = t.prazo && t.status!=='done' && t.prazo < hoje();
+    const vermelho = t.prioridade==='alta' || atrasada;
+    const cArea = corArea(t.area);
+    return `<div class="cartao ${vermelho?'vermelho':''}">
+      <div class="cartao-topo">
+        <span class="prio" style="background:${PRIORIDADES[t.prioridade]?.cor||'#D29A2A'}" title="Prioridade ${nomePrioridade(t.prioridade)}"></span>
+        <span class="cartao-titulo">${escapar(t.titulo)}</span>
+      </div>
+      <div class="cartao-meta">
+        ${atrasada?'<span class="badge-atrasada">Atrasada</span>':''}
+        ${t.area?`<span class="chip area" style="background:${cArea||'#8A9D98'}">${escapar(t.area)}</span>`:''}
+        ${t.responsavel?`<span class="chip pessoa">${escapar(t.responsavel)}</span>`:''}
+        ${prazoFmt?`<span class="chip prazo ${atrasada?'atrasado':''}">${prazoFmt}</span>`:''}
+      </div>
+      <div class="cartao-acoes">
+        <button class="acao mover" data-acao="mover" data-id="${t.id}" data-dir="-1" ${i<=0?'disabled':''} title="Esquerda">←</button>
+        <button class="acao mover" data-acao="mover" data-id="${t.id}" data-dir="1" ${i>=COLUNAS.length-1?'disabled':''} title="Direita">→</button>
+        <button class="acao" data-acao="editar" data-id="${t.id}">Editar</button>
+        <button class="acao excluir" data-acao="excluir" data-id="${t.id}">Excluir</button>
+      </div>
+    </div>`;
+  }
+
+  function renderQuadro(){
+    const opcoes = '<option value="todos">Todos</option>' + pessoasComTarefa().map(p=>`<option value="${escapar(p)}" ${p===filtroPessoa?'selected':''}>${escapar(p)}</option>`).join('');
+    const visiveis = estado.tarefas.filter(t=> filtroPessoa==='todos' || t.responsavel===filtroPessoa);
+    const colunas = COLUNAS.map(col=>{
+      const itens = visiveis.filter(t=>t.status===col.id);
+      return `<section class="coluna">
+        <div class="coluna-topo"><span class="coluna-marca" style="background:${col.cor}"></span><span class="coluna-nome">${col.nome}</span><span class="coluna-conta">${itens.length}</span></div>
+        <div class="lista">${itens.length?itens.map(cartaoHTML).join(''):'<div class="vazio">Nada aqui ainda</div>'}</div>
+      </section>`;
     }).join('');
-    const feitas = tarefas.filter(t => t.status === 'done').length;
-    legenda.innerHTML = `<b>${feitas}</b> de <b>${total}</b> tarefas concluídas`;
+    conteudo.innerHTML = fluxoHTML()
+      + `<div class="barra-acoes"><span class="filtro">Responsável <select class="campo" data-filtro="quadro-pessoa">${opcoes}</select></span><button class="btn btn-principal empurra" data-acao="nova">+ Nova tarefa</button></div>`
+      + `<div class="quadro">${colunas}</div>`;
   }
 
-  function cartaoHTML(t) {
-    const i = COLUNAS.findIndex(c => c.id === t.status);
-    const prazoFmt = formatarPrazo(t.prazo);
-    const atrasado = t.prazo && t.status !== 'done' && t.prazo < hoje();
-    return `
-      <div class="cartao">
-        <div class="cartao-topo">
-          <span class="prio" style="background:${PRIORIDADES[t.prioridade]?.cor || 'var(--p-media)'}" title="Prioridade ${PRIORIDADES[t.prioridade]?.nome || ''}"></span>
-          <span class="cartao-titulo">${escapar(t.titulo)}</span>
+  // ---------- Equipe ----------
+  function renderEquipe(){
+    const membros = estado.membros.map(m=>`<div class="item"><div><div class="nome">${escapar(m.nome)}</div>${m.funcao?`<div class="funcao">${escapar(m.funcao)}</div>`:''}</div><button class="del" data-acao="del-membro" data-id="${m.id}" title="Remover">×</button></div>`).join('') || '<div class="vazio">Nenhum membro cadastrado ainda</div>';
+    const areas = estado.areas.map(a=>`<div class="item"><span class="cor-area" style="background:${a.cor}"></span><div class="nome">${escapar(a.nome)}</div><button class="del" data-acao="del-area" data-id="${a.id}" title="Remover">×</button></div>`).join('') || '<div class="vazio">Nenhuma área cadastrada ainda</div>';
+    conteudo.innerHTML = `<div class="paineis">
+      <div class="painel">
+        <h2>Membros da equipe</h2><p class="sub">Quem você cadastrar aqui aparece na lista de responsáveis ao criar uma tarefa.</p>
+        <div class="form-linha">
+          <input class="campo" id="m-nome" placeholder="Nome" maxlength="60">
+          <input class="campo" id="m-funcao" placeholder="Função (opcional)" maxlength="60">
+          <button class="btn btn-principal btn-fino" data-acao="add-membro">Adicionar</button>
         </div>
-        <div class="cartao-meta">
-          ${t.responsavel ? `<span class="chip pessoa">${escapar(t.responsavel)}</span>` : ''}
-          ${prazoFmt ? `<span class="chip prazo ${atrasado ? 'atrasado' : ''}">${atrasado ? 'Atrasada · ' : ''}${prazoFmt}</span>` : ''}
+        <div class="lista-itens">${membros}</div>
+      </div>
+      <div class="painel">
+        <h2>Áreas</h2><p class="sub">Grupos para classificar as tarefas, como Logística, Comercial, Financeiro.</p>
+        <div class="form-linha">
+          <input class="campo" id="a-nome" placeholder="Nome da área" maxlength="40">
+          <button class="btn btn-principal btn-fino" data-acao="add-area">Adicionar</button>
         </div>
-        <div class="cartao-acoes">
-          <button class="acao mover" data-acao="mover" data-id="${t.id}" data-dir="-1" ${i<=0?'disabled':''} title="Mover para a esquerda">←</button>
-          <button class="acao mover" data-acao="mover" data-id="${t.id}" data-dir="1" ${i>=COLUNAS.length-1?'disabled':''} title="Mover para a direita">→</button>
-          <button class="acao" data-acao="editar" data-id="${t.id}">Editar</button>
-          <button class="acao excluir" data-acao="excluir" data-id="${t.id}" title="Excluir">Excluir</button>
+        <div class="lista-itens">${areas}</div>
+      </div>
+    </div>`;
+  }
+
+  // ---------- Eficácia ----------
+  function statsMembro(nome){
+    const minhas = estado.tarefas.filter(t=>t.responsavel===nome);
+    const concl = minhas.filter(t=>t.status==='done');
+    const comPrazo = concl.filter(t=>t.prazo && t.concluido_em);
+    const noPrazo = comPrazo.filter(t=>t.concluido_em <= t.prazo);
+    const pendAtras = minhas.filter(t=>t.status!=='done' && t.prazo && t.prazo < hoje());
+    const ef = comPrazo.length ? Math.round(noPrazo.length/comPrazo.length*100) : null;
+    return { atribuidas:minhas.length, concl:concl.length, comPrazo:comPrazo.length, noPrazo:noPrazo.length, atras:comPrazo.length-noPrazo.length, pendAtras:pendAtras.length, ef };
+  }
+  function renderEficacia(){
+    const nomes = [...new Set([...estado.membros.map(m=>m.nome), ...pessoasComTarefa()])].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+    if(!nomes.length){ conteudo.innerHTML = '<div class="vazio">Cadastre membros na aba Equipe e atribua tarefas a eles para acompanhar a eficácia.</div>'; return; }
+    const cards = nomes.map(nome=>{
+      const s = statsMembro(nome);
+      const cor = s.ef===null ? 'var(--muted)' : s.ef>=80 ? 'var(--done)' : s.ef>=50 ? 'var(--review)' : 'var(--p-alta)';
+      return `<div class="cartao-ef">
+        <div class="ef-topo"><span class="ef-nome">${escapar(nome)}</span><span class="ef-pct" style="color:${cor}">${s.ef===null?'—':s.ef+'%'}</span></div>
+        <div class="ef-barra"><div style="width:${s.ef===null?0:s.ef}%;background:${cor}"></div></div>
+        <div class="ef-stats">
+          <span class="rotulo">Concluídas</span><span class="valor">${s.concl}</span>
+          <span class="rotulo">No prazo</span><span class="valor">${s.noPrazo} de ${s.comPrazo}</span>
+          <span class="rotulo">Concluídas com atraso</span><span class="valor">${s.atras}</span>
+          <span class="rotulo">Pendências atrasadas</span><span class="valor ${s.pendAtras?'alerta':''}">${s.pendAtras}</span>
         </div>
       </div>`;
+    }).join('');
+    conteudo.innerHTML = `<p class="conta-rel">Eficácia = tarefas concluídas dentro do prazo, entre as que tinham prazo definido.</p><div class="grade-ef">${cards}</div>`;
   }
 
-  function render() {
-    renderFiltro();
-    renderFluxo();
-    const visiveis = tarefas.filter(t => filtroPessoa === 'todos' || t.responsavel === filtroPessoa);
-    conteudo.innerHTML = `<div class="quadro">` + COLUNAS.map(col => {
-      const itens = visiveis.filter(t => t.status === col.id);
-      return `
-        <section class="coluna">
-          <div class="coluna-topo">
-            <span class="coluna-marca" style="background:${col.cor}"></span>
-            <span class="coluna-nome">${col.nome}</span>
-            <span class="coluna-conta">${itens.length}</span>
-          </div>
-          <div class="lista">
-            ${itens.length ? itens.map(cartaoHTML).join('') : '<div class="vazio">Nada aqui ainda</div>'}
-          </div>
-        </section>`;
-    }).join('') + `</div>`;
+  // ---------- Relatório ----------
+  function tarefasFiltradas(){
+    return estado.tarefas.filter(t=>
+      (filtros.resp==='todos' || t.responsavel===filtros.resp) &&
+      (filtros.area==='todos' || t.area===filtros.area) &&
+      (filtros.status==='todos' || t.status===filtros.status) &&
+      (filtros.prio==='todos' || t.prioridade===filtros.prio)
+    );
+  }
+  function selFiltro(chave, atual, itens){
+    return `<select class="campo" data-filtro="${chave}"><option value="todos">Todos</option>` +
+      itens.map(it=>`<option value="${escapar(it.v)}" ${it.v===atual?'selected':''}>${escapar(it.r)}</option>`).join('') + '</select>';
+  }
+  function renderRelatorio(){
+    const pessoas = [...new Set(estado.tarefas.map(t=>t.responsavel).filter(Boolean))].map(v=>({v,r:v}));
+    const areas = estado.areas.map(a=>({v:a.nome,r:a.nome}));
+    const linhas = tarefasFiltradas();
+    const corpo = linhas.map(t=>{
+      const atrasada = t.prazo && t.status!=='done' && t.prazo<hoje();
+      return `<tr>
+        <td>${escapar(t.titulo)}</td>
+        <td>${t.area?`<span class="chip area" style="background:${corArea(t.area)||'#8A9D98'}">${escapar(t.area)}</span>`:'—'}</td>
+        <td>${escapar(t.responsavel)||'—'}</td>
+        <td><span class="tag-prio" style="background:${PRIORIDADES[t.prioridade]?.cor}">${nomePrioridade(t.prioridade)}</span></td>
+        <td><span class="tag-status" style="background:${COLUNAS.find(c=>c.id===t.status)?.hex}">${nomeStatus(t.status)}</span></td>
+        <td style="${atrasada?'color:var(--p-alta);font-weight:600':''}">${formatarData(t.prazo)||'—'}${atrasada?' (atrasada)':''}</td>
+        <td>${formatarData(t.concluido_em)||'—'}</td>
+      </tr>`;
+    }).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px">Nenhuma tarefa com esses filtros.</td></tr>';
+    conteudo.innerHTML = `
+      <div class="barra-acoes nao-imprime">
+        <span class="filtro">Responsável ${selFiltro('rel-resp',filtros.resp,pessoas)}</span>
+        <span class="filtro">Área ${selFiltro('rel-area',filtros.area,areas)}</span>
+        <span class="filtro">Status ${selFiltro('rel-status',filtros.status,COLUNAS.map(c=>({v:c.id,r:c.nome})))}</span>
+        <span class="filtro">Prioridade ${selFiltro('rel-prio',filtros.prio,Object.entries(PRIORIDADES).map(([v,p])=>({v,r:p.nome})))}</span>
+        <button class="btn btn-secundario btn-fino empurra" data-acao="imprimir">Imprimir / PDF</button>
+        <button class="btn btn-principal btn-fino" data-acao="csv">Baixar CSV</button>
+      </div>
+      <p class="conta-rel">${linhas.length} tarefa(s) no relatório.</p>
+      <div class="tabela-wrap"><table class="tabela">
+        <thead><tr><th>Tarefa</th><th>Área</th><th>Responsável</th><th>Prioridade</th><th>Status</th><th>Prazo</th><th>Concluída em</th></tr></thead>
+        <tbody>${corpo}</tbody>
+      </table></div>`;
+  }
+  function baixarCSV(){
+    const linhas = tarefasFiltradas();
+    const esc = (v)=>'"'+String(v??'').replace(/"/g,'""')+'"';
+    const cab = ['Tarefa','Área','Responsável','Prioridade','Status','Prazo','Concluída em'];
+    const corpo = linhas.map(t=>[t.titulo,t.area,t.responsavel,nomePrioridade(t.prioridade),nomeStatus(t.status),t.prazo,t.concluido_em].map(esc).join(','));
+    const csv = '\ufeff' + [cab.map(esc).join(','), ...corpo].join('\r\n');
+    const blob = new Blob([csv],{type:'text/csv;charset=utf-8'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'relatorio-tarefas.csv'; a.click();
+    URL.revokeObjectURL(a.href);
   }
 
-  // ---------- Ações ----------
-  conteudo.addEventListener('click', async (e) => {
-    const botao = e.target.closest('[data-acao]');
-    if (!botao) return;
-    const id = botao.dataset.id;
-    const t = tarefas.find(x => x.id === id);
-    if (!t) return;
-
-    if (botao.dataset.acao === 'mover') {
-      const i = COLUNAS.findIndex(c => c.id === t.status) + Number(botao.dataset.dir);
-      if (i < 0 || i >= COLUNAS.length) return;
-      await acaoServidor(() => api('PATCH', '/api/tarefas/' + id, { status: COLUNAS[i].id }));
-    } else if (botao.dataset.acao === 'editar') {
-      abrirModal(t);
-    } else if (botao.dataset.acao === 'excluir') {
-      if (confirm('Excluir "' + t.titulo + '"? Isso não pode ser desfeito.')) {
-        await acaoServidor(() => api('DELETE', '/api/tarefas/' + id));
-      }
-    }
-  });
-
-  async function acaoServidor(fn) {
-    ocupado = true;
-    try {
-      await fn();
-      tarefas = await api('GET', '/api/tarefas');
-      limparErro();
-      conectado(true);
-      render();
-    } catch (err) {
-      mostrarErro(err.message);
-    } finally {
-      ocupado = false;
-    }
+  // ---------- Modal de tarefa ----------
+  function opcoesSelect(lista, atual, vazio){
+    let extra = '';
+    if(atual && !lista.includes(atual)) extra = `<option value="${escapar(atual)}" selected>${escapar(atual)}</option>`;
+    return `<option value="">${vazio}</option>` + extra + lista.map(n=>`<option value="${escapar(n)}" ${n===atual?'selected':''}>${escapar(n)}</option>`).join('');
   }
-
-  // ---------- Modal ----------
-  function abrirModal(t) {
+  function abrirModal(t){
     editandoId = t ? t.id : null;
     $('#modal-titulo').textContent = t ? 'Editar tarefa' : 'Nova tarefa';
-    $('#f-titulo').value = t ? t.titulo : '';
-    $('#f-responsavel').value = t ? t.responsavel : '';
-    $('#f-prazo').value = t ? t.prazo : '';
-    $('#f-prioridade').value = t ? t.prioridade : 'media';
-    $('#f-status').value = t ? t.status : 'todo';
+    $('#f-titulo').value = t?t.titulo:'';
+    $('#f-responsavel').innerHTML = opcoesSelect(estado.membros.map(m=>m.nome), t?t.responsavel:'', '— Sem responsável —');
+    $('#f-area').innerHTML = opcoesSelect(estado.areas.map(a=>a.nome), t?t.area:'', '— Sem área —');
+    $('#f-prazo').value = t?t.prazo:'';
+    $('#f-prioridade').value = t?t.prioridade:'media';
+    $('#f-status').value = t?t.status:'todo';
     $('#overlay').classList.add('aberto');
-    setTimeout(() => $('#f-titulo').focus(), 30);
+    setTimeout(()=>$('#f-titulo').focus(),30);
   }
-  function fecharModal() {
-    $('#overlay').classList.remove('aberto');
-    editandoId = null;
-  }
-
-  async function salvar() {
+  function fecharModal(){ $('#overlay').classList.remove('aberto'); editandoId=null; }
+  async function salvar(){
     const dados = {
       titulo: $('#f-titulo').value.trim(),
-      responsavel: $('#f-responsavel').value.trim(),
+      responsavel: $('#f-responsavel').value,
+      area: $('#f-area').value,
       prazo: $('#f-prazo').value,
       prioridade: $('#f-prioridade').value,
       status: $('#f-status').value,
     };
-    if (!dados.titulo) { $('#f-titulo').focus(); return; }
-    await acaoServidor(() =>
-      editandoId
-        ? api('PATCH', '/api/tarefas/' + editandoId, dados)
-        : api('POST', '/api/tarefas', dados)
-    );
+    if(!dados.titulo){ $('#f-titulo').focus(); return; }
+    await acaoServidor(()=> editandoId ? api('PATCH','/api/tarefas/'+editandoId,dados) : api('POST','/api/tarefas',dados));
     fecharModal();
   }
 
-  $('#btn-nova').addEventListener('click', () => abrirModal(null));
-  $('#btn-cancelar').addEventListener('click', fecharModal);
-  $('#btn-salvar').addEventListener('click', salvar);
-  $('#overlay').addEventListener('click', (e) => { if (e.target.id === 'overlay') fecharModal(); });
-  $('#filtro-pessoa').addEventListener('change', (e) => { filtroPessoa = e.target.value; render(); });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') fecharModal();
-    if (e.key === 'Enter' && $('#overlay').classList.contains('aberto') && e.target.tagName !== 'SELECT') salvar();
+  // ---------- Eventos ----------
+  $('#nav').addEventListener('click',(e)=>{ const a=e.target.closest('.aba'); if(!a) return; vista=a.dataset.vista; render(); });
+
+  conteudo.addEventListener('click', async (e)=>{
+    const b = e.target.closest('[data-acao]'); if(!b) return;
+    const acao = b.dataset.acao, id = b.dataset.id;
+    if(acao==='nova'){ abrirModal(null); }
+    else if(acao==='editar'){ abrirModal(estado.tarefas.find(t=>t.id===id)); }
+    else if(acao==='mover'){ const t=estado.tarefas.find(x=>x.id===id); const i=COLUNAS.findIndex(c=>c.id===t.status)+Number(b.dataset.dir); if(i<0||i>=COLUNAS.length) return; await acaoServidor(()=>api('PATCH','/api/tarefas/'+id,{status:COLUNAS[i].id})); }
+    else if(acao==='excluir'){ const t=estado.tarefas.find(x=>x.id===id); if(confirm('Excluir "'+t.titulo+'"? Isso não pode ser desfeito.')) await acaoServidor(()=>api('DELETE','/api/tarefas/'+id)); }
+    else if(acao==='add-membro'){ const nome=$('#m-nome').value.trim(); if(!nome) return $('#m-nome').focus(); await acaoServidor(()=>api('POST','/api/membros',{nome,funcao:$('#m-funcao').value.trim()})); }
+    else if(acao==='del-membro'){ await acaoServidor(()=>api('DELETE','/api/membros/'+id)); }
+    else if(acao==='add-area'){ const nome=$('#a-nome').value.trim(); if(!nome) return $('#a-nome').focus(); await acaoServidor(()=>api('POST','/api/areas',{nome})); }
+    else if(acao==='del-area'){ await acaoServidor(()=>api('DELETE','/api/areas/'+id)); }
+    else if(acao==='csv'){ baixarCSV(); }
+    else if(acao==='imprimir'){ window.print(); }
   });
 
-  // ---------- Início + sincronização automática ----------
+  conteudo.addEventListener('change',(e)=>{
+    const s = e.target.closest('[data-filtro]'); if(!s) return;
+    const f = s.dataset.filtro;
+    if(f==='quadro-pessoa'){ filtroPessoa = s.value; render(); }
+    else if(f==='rel-resp'){ filtros.resp = s.value; render(); }
+    else if(f==='rel-area'){ filtros.area = s.value; render(); }
+    else if(f==='rel-status'){ filtros.status = s.value; render(); }
+    else if(f==='rel-prio'){ filtros.prio = s.value; render(); }
+  });
+
+  $('#btn-cancelar').addEventListener('click', fecharModal);
+  $('#btn-salvar').addEventListener('click', salvar);
+  $('#overlay').addEventListener('click',(e)=>{ if(e.target.id==='overlay') fecharModal(); });
+  document.addEventListener('keydown',(e)=>{ if(e.key==='Escape') fecharModal(); });
+
   carregar();
-  setInterval(carregar, 5000); // a cada 5s busca o que os colegas mudaram
+  setInterval(carregar, 5000);
 </script>
 </body>
 </html>
