@@ -144,6 +144,8 @@
   .modal-acoes .btn { flex: 1; padding: 13px 16px; font-size: .98rem; }
   @media (max-width: 540px) { .dois { flex-direction: column; gap: 0; } }
   .dica { font-size: .78rem; color: var(--muted); }
+  .trava-nota { display: none; font-size: .78rem; color: var(--brand); margin-top: 7px; }
+  .grupo input:disabled { background: var(--bg); color: var(--muted); cursor: not-allowed; }
 
   input:focus, select:focus, .btn:focus-visible, .acao:focus-visible, .aba:focus-visible, .del:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
   .carregando { text-align: center; color: var(--muted); padding: 60px 20px; }
@@ -197,6 +199,7 @@
         <div class="grupo">
           <label for="f-prazo">Prazo</label>
           <input type="date" id="f-prazo">
+          <span class="trava-nota" id="f-prazo-trava">🔒 O prazo é travado após a criação e não pode ser alterado.</span>
         </div>
         <div class="grupo">
           <label for="f-prioridade">Prioridade</label>
@@ -463,7 +466,10 @@
     $('#f-titulo').value = t?t.titulo:'';
     $('#f-responsavel').innerHTML = opcoesSelect(estado.membros.map(m=>m.nome), t?t.responsavel:'', '— Sem responsável —');
     $('#f-area').innerHTML = opcoesSelect(estado.areas.map(a=>a.nome), t?t.area:'', '— Sem área —');
+    const editando = !!t;
     $('#f-prazo').value = t?t.prazo:'';
+    $('#f-prazo').disabled = editando;
+    $('#f-prazo-trava').style.display = editando ? 'block' : 'none';
     $('#f-prioridade').value = t?t.prioridade:'media';
     $('#f-status').value = t?t.status:(presetStatus||'todo');
     $('#overlay').classList.add('aberto');
