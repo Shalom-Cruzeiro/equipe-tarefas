@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: quadro-equipe
+    runtime: node
+    plan: starter            # plano pago (necessário para disco persistente)
+    region: oregon           # troque se preferir outra região
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: DATA_DIR
+        value: /var/data
+    disk:
+      name: dados
+      mountPath: /var/data   # o banco SQLite vive aqui e sobrevive a deploys
+      sizeGB: 1

@@ -1,0 +1,15 @@
+{
+  "name": "equipe-tarefas",
+  "version": "1.0.0",
+  "description": "Quadro de tarefas compartilhado para a equipe",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
