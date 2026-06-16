@@ -105,7 +105,8 @@
   .item .nome { font-weight: 500; font-size: .9rem; }
   .item .funcao { font-size: .78rem; color: var(--muted); }
   .item .cor-area { width: 12px; height: 12px; border-radius: 4px; flex: none; }
-  .item .del { margin-left: auto; border: none; background: transparent; color: var(--muted); cursor: pointer; font-size: 1.1rem; padding: 2px 8px; border-radius: 7px; }
+  .item-acoes { margin-left: auto; display: flex; gap: 4px; align-items: center; }
+  .item .del { border: none; background: transparent; color: var(--muted); cursor: pointer; font-size: 1.1rem; padding: 2px 8px; border-radius: 7px; }
   .item .del:hover { background: #F7D6CF; color: var(--p-alta); }
 
   /* eficacia */
@@ -345,13 +346,25 @@
 
   // ---------- Equipe ----------
   function renderEquipe(){
-    const membros = estado.membros.map(m=>`<div class="item"><div><div class="nome">${escapar(m.nome)}</div>${m.funcao?`<div class="funcao">${escapar(m.funcao)}</div>`:''}</div><button class="del" data-acao="del-membro" data-id="${m.id}" title="Remover">×</button></div>`).join('') || '<div class="vazio">Nenhum membro cadastrado ainda</div>';
-    const areas = estado.areas.map(a=>`<div class="item"><span class="cor-area" style="background:${a.cor}"></span><div class="nome">${escapar(a.nome)}</div><button class="del" data-acao="del-area" data-id="${a.id}" title="Remover">×</button></div>`).join('') || '<div class="vazio">Nenhuma área cadastrada ainda</div>';
+    const membros = estado.membros.map(m=>`<div class="item">
+        <div style="min-width:0">
+          <div class="nome">${escapar(m.nome)}</div>
+          <div class="funcao">${m.funcao?escapar(m.funcao)+' · ':''}${m.email?escapar(m.email):'<span style="color:var(--p-alta)">sem e-mail</span>'}</div>
+        </div>
+        <div class="item-acoes">
+          <button class="acao" data-acao="email-membro" data-id="${m.id}">e-mail</button>
+          ${m.email&&estado.emailAtivo?`<button class="acao" data-acao="teste-membro" data-id="${m.id}">teste</button>`:''}
+          <button class="del" data-acao="del-membro" data-id="${m.id}" title="Remover">×</button>
+        </div>
+      </div>`).join('') || '<div class="vazio">Nenhum membro cadastrado ainda</div>';
+    const areas = estado.areas.map(a=>`<div class="item"><span class="cor-area" style="background:${a.cor}"></span><div class="nome">${escapar(a.nome)}</div><div class="item-acoes"><button class="del" data-acao="del-area" data-id="${a.id}" title="Remover">×</button></div></div>`).join('') || '<div class="vazio">Nenhuma área cadastrada ainda</div>';
+    const avisoEmail = estado.emailAtivo ? '' : '<br><b style="color:var(--p-alta)">O envio de e-mail ainda não está configurado no servidor.</b>';
     conteudo.innerHTML = `<div class="paineis">
       <div class="painel">
-        <h2>Membros da equipe</h2><p class="sub">Quem você cadastrar aqui aparece na lista de responsáveis ao criar uma tarefa.</p>
+        <h2>Membros da equipe</h2><p class="sub">Cadastre o e-mail para a pessoa receber avisos de novas tarefas, prazos e atrasos.${avisoEmail}</p>
         <div class="form-linha">
           <input class="campo" id="m-nome" placeholder="Nome" maxlength="60">
+          <input class="campo" id="m-email" type="email" placeholder="E-mail" maxlength="120">
           <input class="campo" id="m-funcao" placeholder="Função (opcional)" maxlength="60">
           <button class="btn btn-principal btn-fino" data-acao="add-membro">Adicionar</button>
         </div>
@@ -501,7 +514,9 @@
     else if(acao==='editar'){ abrirModal(estado.tarefas.find(t=>t.id===id)); }
     else if(acao==='mover'){ const t=estado.tarefas.find(x=>x.id===id); const i=COLUNAS.findIndex(c=>c.id===t.status)+Number(b.dataset.dir); if(i<0||i>=COLUNAS.length) return; await acaoServidor(()=>api('PATCH','/api/tarefas/'+id,{status:COLUNAS[i].id})); }
     else if(acao==='excluir'){ const t=estado.tarefas.find(x=>x.id===id); if(confirm('Excluir "'+t.titulo+'"? Isso não pode ser desfeito.')) await acaoServidor(()=>api('DELETE','/api/tarefas/'+id)); }
-    else if(acao==='add-membro'){ const nome=$('#m-nome').value.trim(); if(!nome) return $('#m-nome').focus(); await acaoServidor(()=>api('POST','/api/membros',{nome,funcao:$('#m-funcao').value.trim()})); }
+    else if(acao==='add-membro'){ const nome=$('#m-nome').value.trim(); if(!nome) return $('#m-nome').focus(); await acaoServidor(()=>api('POST','/api/membros',{nome,email:$('#m-email').value.trim(),funcao:$('#m-funcao').value.trim()})); }
+    else if(acao==='email-membro'){ const m=estado.membros.find(x=>x.id===id); const novo=prompt('E-mail de '+m.nome+':', m.email||''); if(novo===null) return; await acaoServidor(()=>api('PATCH','/api/membros/'+id,{email:novo.trim()})); }
+    else if(acao==='teste-membro'){ try{ ocupado=true; await api('POST','/api/email/teste',{id}); alert('E-mail de teste enviado! Confira a caixa de entrada (e o spam).'); }catch(e){ alert('Não foi possível enviar: '+e.message); } finally{ ocupado=false; } }
     else if(acao==='del-membro'){ await acaoServidor(()=>api('DELETE','/api/membros/'+id)); }
     else if(acao==='add-area'){ const nome=$('#a-nome').value.trim(); if(!nome) return $('#a-nome').focus(); await acaoServidor(()=>api('POST','/api/areas',{nome})); }
     else if(acao==='del-area'){ await acaoServidor(()=>api('DELETE','/api/areas/'+id)); }
